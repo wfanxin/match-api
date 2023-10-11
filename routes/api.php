@@ -19,41 +19,11 @@ $dingoApi = app(\Dingo\Api\Routing\Router::class);
 $dingoApi->version("v1", [
     "middleware" => ["AdminToken", "CrossHttp"]
 ], function ($dingoApi) {
-
-    // 公司联盟
-    $dingoApi->get("lease/federation/list", \App\Http\Controllers\Admin\Lease\FederationController::class."@list")->name("lease.federation.list");
-    $dingoApi->post("lease/federation/add", \App\Http\Controllers\Admin\Lease\FederationController::class."@add")->name("lease.federation.add");
-    $dingoApi->post("lease/federation/edit", \App\Http\Controllers\Admin\Lease\FederationController::class."@edit")->name("lease.federation.edit");
-    $dingoApi->post("lease/federation/del", \App\Http\Controllers\Admin\Lease\FederationController::class."@del")->name("lease.federation.del");
-
     // 租赁公司
     $dingoApi->get("lease/company/list", \App\Http\Controllers\Admin\Lease\CompanyController::class."@list")->name("lease.company.list");
     $dingoApi->post("lease/company/add", \App\Http\Controllers\Admin\Lease\CompanyController::class."@add")->name("lease.company.add");
     $dingoApi->post("lease/company/edit", \App\Http\Controllers\Admin\Lease\CompanyController::class."@edit")->name("lease.company.edit");
     $dingoApi->post("lease/company/del", \App\Http\Controllers\Admin\Lease\CompanyController::class."@del")->name("lease.company.del");
-
-    // 租赁合同
-    $dingoApi->get("lease/house/list", \App\Http\Controllers\Admin\Lease\HouseController::class."@list")->name("lease.house.list");
-    $dingoApi->post("lease/house/add", \App\Http\Controllers\Admin\Lease\HouseController::class."@add")->name("lease.house.add");
-    $dingoApi->post("lease/house/edit", \App\Http\Controllers\Admin\Lease\HouseController::class."@edit")->name("lease.house.edit");
-    $dingoApi->post("lease/house/submitReview", \App\Http\Controllers\Admin\Lease\HouseController::class."@submitReview")->name("lease.house.submitReview");
-    $dingoApi->post("lease/house/del", \App\Http\Controllers\Admin\Lease\HouseController::class."@del")->name("lease.house.del");
-    $dingoApi->post("lease/house/exportExcel", \App\Http\Controllers\Admin\Lease\HouseController::class."@exportExcel")->name("lease.house.exportExcel");
-    $dingoApi->get("lease/house/detail", \App\Http\Controllers\Admin\Lease\HouseController::class."@detail")->name("lease.house.detail");
-    $dingoApi->post("lease/house/preview", \App\Http\Controllers\Admin\Lease\HouseController::class."@preview")->name("lease.house.preview");
-
-    // 合同审批
-    $dingoApi->get("lease/approval/list", \App\Http\Controllers\Admin\Lease\ApprovalController::class."@list")->name("lease.approval.list");
-    $dingoApi->post("lease/approval/pass", \App\Http\Controllers\Admin\Lease\ApprovalController::class."@pass")->name("lease.approval.pass");
-    $dingoApi->post("lease/approval/fail", \App\Http\Controllers\Admin\Lease\ApprovalController::class."@fail")->name("lease.approval.fail");
-
-    // 公告管理
-    $dingoApi->get("lease/notice/list", \App\Http\Controllers\Admin\Lease\NoticeController::class."@list")->name("lease.notice.list");
-    $dingoApi->get("lease/notice/getNotice", \App\Http\Controllers\Admin\Lease\NoticeController::class."@getNotice")->name("lease.notice.getNotice");
-    $dingoApi->post("lease/notice/read", \App\Http\Controllers\Admin\Lease\NoticeController::class."@read")->name("lease.notice.read");
-
-    // 统计数据
-    $dingoApi->get("lease/statPrice/getData", \App\Http\Controllers\Admin\Lease\StatPriceController::class."@getData")->name("lease.statPrice.getData");
 
     // 用户
     $dingoApi->post("users/checkName", \App\Http\Controllers\Admin\System\UserController::class."@checkName")->name("users.checkName");
