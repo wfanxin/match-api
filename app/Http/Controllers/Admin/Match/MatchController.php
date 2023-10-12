@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Match;
 
 use App\Http\Controllers\Admin\Controller;
 use App\Http\Traits\FormatTrait;
+use App\Model\Admin\Match;
 use App\Model\Admin\Tag;
 use Illuminate\Http\Request;
 
@@ -25,7 +26,7 @@ class MatchController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      **/
-    public function list(Request $request, Tag $mTag)
+    public function list(Request $request, Match $mMatch, Tag $mTag)
     {
         $params = $request->all();
         $params['userId'] = $request->userId;
@@ -46,20 +47,20 @@ class MatchController extends Controller
         $sort = 'desc';
         $page = $params['page'] ?? 1;
         $pageSize = $params['pageSize'] ?? config('global.page_size');
-        $data = $mTag->where($where)
+        $data = $mMatch->where($where)
             ->orderBy($orderField, $sort)
             ->paginate($pageSize, ['*'], 'page', $page);
 
-        if (!empty($data->items())) {
-            $tag_list = config('global.tag_list');
-            $tag_list = array_column($tag_list, 'label', 'value');
-            foreach ($data->items() as $k => $v){
-                $data->items()[$k]['pname'] = $tag_list[$v->pid] ?? ''; // 标签大类名称
-            }
-        }
-
         $tag_sub_list = $mTag->get(['pid', 'id', 'name']);
         $tag_sub_list = $this->dbResult($tag_sub_list);
+
+        if (!empty($data->items())) {
+            $tag_sub_list_arr = array_column($tag_sub_list, 'pid', 'id');
+            foreach ($data->items() as $k => $v){
+                $data->items()[$k]['ptag_id'] = $tag_sub_list_arr[$v->tag_id] ?? 0;
+                $data->items()[$k]['match_data'] = json_decode($v->match_data, true) ?? [];
+            }
+        }
 
         return $this->jsonAdminResult([
             'total' => $data->total(),
@@ -77,36 +78,69 @@ class MatchController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      **/
-    public function add(Request $request, Tag $mTag)
+    public function add(Request $request, Match $mMatch)
     {
         $params = $request->all();
         $params['userId'] = $request->userId;
 
-        $pid = $params['pid'] ?? 0;
-        $name = $params['name'] ?? '';
+        $tag_id = $params['tag_id'] ?? 0;
+        $match_play = trim($params['match_play'] ?? '');
+        $match_score = trim($params['match_score'] ?? '');
+        $match_result = trim($params['match_result'] ?? '');
+        $match_half_audience = trim($params['match_half_audience'] ?? '');
+        $match_type = trim($params['match_type'] ?? '');
+        $match_data = $params['match_data'] ?? [];
 
-        if (empty($pid)) {
-            return $this->jsonAdminResult([],10001, '请选择标签大类');
+        if (empty($tag_id)) {
+            return $this->jsonAdminResult([],10001, '请选择标签子类');
         }
 
-        if (!in_array($pid, array_column(config('global.tag_list'), 'value'))) {
-            return $this->jsonAdminResult([],10001, '标签大类错误');
+        if (empty($match_play)) {
+            return $this->jsonAdminResult([],10001, '比赛场次不能为空');
         }
 
-        if (empty($name)){
-            return $this->jsonAdminResult([],10001, '子类名称不能为空');
+        if (empty($match_score)) {
+            return $this->jsonAdminResult([],10001, '比分不能为空');
         }
 
-        $info = $mTag->where('pid', $pid)->where('name', $name)->first();
-        $info = $this->dbResult($info);
-        if (!empty($info)) {
-            return $this->jsonAdminResult([],10001, '子类名称重复');
+        if (empty($match_result)) {
+            return $this->jsonAdminResult([],10001, '比赛结果不能为空');
+        }
+
+        if (empty($match_half_audience)) {
+            return $this->jsonAdminResult([],10001, '半全场不能为空');
+        }
+
+        if (empty($match_type)) {
+            return $this->jsonAdminResult([],10001, '比赛类型不能为空');
+        }
+
+        if (empty($match_data)) {
+            return $this->jsonAdminResult([],10001, '数据不能为空');
+        }
+
+        foreach ($match_data as $key => $value) {
+            foreach ($value['list'] as $k => $v) {
+                foreach ($v as  $valueKey => $valueData) {
+                    $v[$valueKey] = trim($valueData);
+                    if (empty($v[$valueKey])) {
+                        return $this->jsonAdminResult([],10001, '数据不能为空');
+                    }
+                }
+                $value['list'][$k] = $v;
+            }
+            $match_data[$key] = $value;
         }
 
         $time = date('Y-m-d H:i:s');
-        $res = $mTag->insert([
-            'pid' => $pid,
-            'name' => $name,
+        $res = $mMatch->insert([
+            'tag_id' => $tag_id,
+            'match_play' => $match_play,
+            'match_score' => $match_score,
+            'match_result' => $match_result,
+            'match_half_audience' => $match_half_audience,
+            'match_type' => $match_type,
+            'match_data' => json_encode($match_data),
             'created_at' => $time,
             'updated_at' => $time
         ]);
