@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Http\Traits\FormatTrait;
 use Illuminate\Support\Facades\DB;
 
-class Federation extends Model
+class Tag extends Model
 {
     use FormatTrait;
-    public $table = 'federations';
+    public $table = 'tags';
 }

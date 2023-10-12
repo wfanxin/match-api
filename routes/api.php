@@ -19,11 +19,17 @@ $dingoApi = app(\Dingo\Api\Routing\Router::class);
 $dingoApi->version("v1", [
     "middleware" => ["AdminToken", "CrossHttp"]
 ], function ($dingoApi) {
-    // 租赁公司
-    $dingoApi->get("lease/company/list", \App\Http\Controllers\Admin\Lease\CompanyController::class."@list")->name("lease.company.list");
-    $dingoApi->post("lease/company/add", \App\Http\Controllers\Admin\Lease\CompanyController::class."@add")->name("lease.company.add");
-    $dingoApi->post("lease/company/edit", \App\Http\Controllers\Admin\Lease\CompanyController::class."@edit")->name("lease.company.edit");
-    $dingoApi->post("lease/company/del", \App\Http\Controllers\Admin\Lease\CompanyController::class."@del")->name("lease.company.del");
+    // 标签管理
+    $dingoApi->get("match/tag/list", \App\Http\Controllers\Admin\Match\TagController::class."@list")->name("match.tag.list");
+    $dingoApi->post("match/tag/add", \App\Http\Controllers\Admin\Match\TagController::class."@add")->name("match.tag.add");
+    $dingoApi->post("match/tag/edit", \App\Http\Controllers\Admin\Match\TagController::class."@edit")->name("match.tag.edit");
+    $dingoApi->post("match/tag/del", \App\Http\Controllers\Admin\Match\TagController::class."@del")->name("match.tag.del");
+
+    // 比赛管理
+    $dingoApi->get("match/match/list", \App\Http\Controllers\Admin\Match\MatchController::class."@list")->name("match.match.list");
+    $dingoApi->post("match/match/add", \App\Http\Controllers\Admin\Match\MatchController::class."@add")->name("match.match.add");
+    $dingoApi->post("match/match/edit", \App\Http\Controllers\Admin\Match\MatchController::class."@edit")->name("match.match.edit");
+    $dingoApi->post("match/match/del", \App\Http\Controllers\Admin\Match\MatchController::class."@del")->name("match.match.del");
 
     // 用户
     $dingoApi->post("users/checkName", \App\Http\Controllers\Admin\System\UserController::class."@checkName")->name("users.checkName");

@@ -6,13 +6,9 @@
 return [
     // sort唯一
     'nav' => [
-        'Welcome' => [
-            'sort' => 1,
-            'alias' => '首页'
-        ],
-        'Lease' => [
+        'Match' => [
             'sort' => 2,
-            'alias' => '租赁管理'
+            'alias' => '比赛管理'
         ],
         'System' => [
             'sort' => 3,
@@ -21,15 +17,8 @@ return [
     ],
     // 栏目
     'nav_show_list' => [
-        '@Get:lv_lease_federation_list',
-        '@Get:lv_lease_company_list',
-        '@Get:lv_lease_house_list',
-        '@Get:lv_lease_approval_list',
-        '@Get:lv_lease_notice_list',
-        '@Get:lv_permissions',
-        '@Get:lv_roles',
-        '@Get:lv_users',
-        '@Get:lv_logs'
+        '@Get:lv_match_tag_list',
+        '@Get:lv_match_match_list'
     ],
     'aliyun_oss' => [
         'AccessKeyId' => '',
