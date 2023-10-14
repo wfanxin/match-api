@@ -55,25 +55,31 @@ class MatchController extends Controller
             }];
         }
 
+        $total = $mMatch->where($where)->count();
+
+        if (!empty($params['id'])) {
+            $where[] = ['id', '<', $params['id']];
+        }
+
         $orderField = 'id';
         $sort = 'desc';
-        $page = $params['page'] ?? 1;
-        $pageSize = $params['pageSize'] ?? config('global.page_size');
-        $data = $mMatch->where($where)
+        $list = $mMatch->where($where)
             ->orderBy($orderField, $sort)
-            ->paginate($pageSize, ['*'], 'page', $page);
+            ->limit(config('global.page_size'))
+            ->get();
+        $list = $this->dbResult($list);
 
-        if (!empty($data->items())) {
+        if (!empty($list)) {
             $tag_sub_list_arr = array_column($tag_sub_list, 'pid', 'id');
-            foreach ($data->items() as $k => $v){
-                $data->items()[$k]['ptag_id'] = $tag_sub_list_arr[$v->tag_id] ?? 0;
-                $data->items()[$k]['match_data'] = json_decode($v->match_data, true) ?? [];
+            foreach ($list as $k => $v){
+                $list[$k]['ptag_id'] = $tag_sub_list_arr[$v['tag_id']] ?? 0;
+                $list[$k]['match_data'] = json_decode($v['match_data'], true) ?? [];
             }
         }
 
         return $this->jsonAdminResult([
-            'total' => $data->total(),
-            'data' => $data->items(),
+            'total' => $total,
+            'data' => $list,
             'tag_list' => config('global.tag_list'),
             'tag_sub_list' => $tag_sub_list,
             'platform_list' => config('global.platform_list')
