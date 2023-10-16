@@ -15,7 +15,8 @@ class CreateMatchsTable extends Migration
     {
         Schema::create('matchs', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('tag_id')->default(0)->comment('标签id');
+            $table->tinyInteger('ptag_id')->default(0)->comment('标签大类id');
+            $table->string('tag_id',500)->default('')->comment('标签子类id');
             $table->string('match_play', 255)->default('')->comment('比赛场次');
             $table->string('match_score', 255)->default('')->comment('比分');
             $table->string('match_result', 255)->default('')->comment('比赛结果');

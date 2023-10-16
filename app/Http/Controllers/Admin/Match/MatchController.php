@@ -37,22 +37,17 @@ class MatchController extends Controller
         $where = [];
 
         if (!empty($params['pid'])) {
-            $ids = [];
-            foreach ($tag_sub_list as $value) {
-                if ($value['pid'] == $params['pid']) {
-                    $ids[] = $value['id'];
-                }
-            }
-            $where[] = [function ($query) use ($ids) {
-                $query->whereIn('tag_id', $ids);
-            }];
+            $where[] = ['ptag_id', '=', $params['pid']];
         }
 
         // 标签大类id
         if (!empty($params['ids'])){
-            $where[] = [function ($query) use ($params) {
-                $query->whereIn('tag_id', $params['ids']);
-            }];
+            $tag_id = [];
+            foreach ($params['ids'] as $v) {
+                $tag_id[] = intval($v);
+            }
+            sort($tag_id);
+            $where[] = ['tag_id', '=', json_encode($tag_id)];
         }
 
         $total = $mMatch->where($where)->count();
@@ -70,9 +65,8 @@ class MatchController extends Controller
         $list = $this->dbResult($list);
 
         if (!empty($list)) {
-            $tag_sub_list_arr = array_column($tag_sub_list, 'pid', 'id');
             foreach ($list as $k => $v){
-                $list[$k]['ptag_id'] = $tag_sub_list_arr[$v['tag_id']] ?? 0;
+                $list[$k]['tag_id'] = json_decode($v['tag_id'], true) ?? [];
                 $list[$k]['match_data'] = json_decode($v['match_data'], true) ?? [];
             }
         }
@@ -98,7 +92,8 @@ class MatchController extends Controller
         $params = $request->all();
         $params['userId'] = $request->userId;
 
-        $tag_id = $params['tag_id'] ?? 0;
+        $ptag_id = $params['ptag_id'] ?? 0;
+        $tag_id = $params['tag_id'] ?? [];
         $match_play = trim($params['match_play'] ?? '');
         $match_score = trim($params['match_score'] ?? '');
         $match_result = trim($params['match_result'] ?? '');
@@ -148,8 +143,10 @@ class MatchController extends Controller
         }
 
         $time = date('Y-m-d H:i:s');
+        sort($tag_id);
         $res = $mMatch->insert([
-            'tag_id' => $tag_id,
+            'ptag_id' => $ptag_id,
+            'tag_id' => json_encode($tag_id),
             'match_play' => $match_play,
             'match_score' => $match_score,
             'match_result' => $match_result,
@@ -179,7 +176,8 @@ class MatchController extends Controller
         $params = $request->all();
 
         $id = $params['id'] ?? 0;
-        $tag_id = $params['tag_id'] ?? 0;
+        $ptag_id = $params['ptag_id'] ?? 0;
+        $tag_id = $params['tag_id'] ?? [];
         $match_play = trim($params['match_play'] ?? '');
         $match_score = trim($params['match_score'] ?? '');
         $match_result = trim($params['match_result'] ?? '');
@@ -233,8 +231,10 @@ class MatchController extends Controller
         }
 
         $time = date('Y-m-d H:i:s');
+        sort($tag_id);
         $res = $mMatch->where('id', $id)->update([
-            'tag_id' => $tag_id,
+            'ptag_id' => $ptag_id,
+            'tag_id' => json_encode($tag_id),
             'match_play' => $match_play,
             'match_score' => $match_score,
             'match_result' => $match_result,
