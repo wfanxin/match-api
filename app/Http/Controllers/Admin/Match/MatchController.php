@@ -7,6 +7,7 @@ use App\Http\Traits\FormatTrait;
 use App\Model\Admin\Match;
 use App\Model\Admin\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @name 比赛管理
@@ -31,8 +32,9 @@ class MatchController extends Controller
         $params = $request->all();
         $params['userId'] = $request->userId;
 
-        $tag_sub_list = $mTag->get(['pid', 'id', 'name']);
-        $tag_sub_list = $this->dbResult($tag_sub_list);
+//        $tag_sub_list = $mTag->get(['pid', 'id', 'name']);
+//        $tag_sub_list = $this->dbResult($tag_sub_list);
+        $tag_sub_list = DB::select('SELECT pid, id, name FROM `tags` WHERE 1 order by convert(name using gbk) asc');
 
         $where = [];
 
