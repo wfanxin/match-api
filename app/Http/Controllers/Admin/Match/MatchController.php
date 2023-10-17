@@ -42,12 +42,9 @@ class MatchController extends Controller
 
         // 标签大类id
         if (!empty($params['ids'])){
-            $tag_id = [];
-            foreach ($params['ids'] as $v) {
-                $tag_id[] = intval($v);
-            }
+            $tag_id = $params['ids'];
             sort($tag_id);
-            $where[] = ['tag_id', '=', json_encode($tag_id)];
+            $where[] = ['tag_id', '=', '[' . implode(',', $tag_id) . ']'];
         }
 
         $total = $mMatch->where($where)->count();
@@ -102,7 +99,7 @@ class MatchController extends Controller
         $match_data = $params['match_data'] ?? [];
 
         if (empty($tag_id)) {
-            return $this->jsonAdminResult([],10001, '请选择标签子类');
+            return $this->jsonAdminResult([],10001, '请选择标签');
         }
 
         if (empty($match_play)) {
@@ -190,7 +187,7 @@ class MatchController extends Controller
         }
 
         if (empty($tag_id)) {
-            return $this->jsonAdminResult([],10001, '请选择标签子类');
+            return $this->jsonAdminResult([],10001, '请选择标签');
         }
 
         if (empty($match_play)) {
