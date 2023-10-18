@@ -46,7 +46,25 @@ class MatchController extends Controller
         if (!empty($params['ids'])){
             $tag_id = $params['ids'];
             sort($tag_id);
-            $where[] = ['tag_id', '=', '[' . implode(',', $tag_id) . ']'];
+            $before_tag_id = [];
+            $after_tag_id = [];
+            foreach ($tag_id as $value) {
+                $value_arr = json_decode($value, true);
+                if ($value_arr[0] == 1) {
+                    $before_tag_id[] = $value;
+                } else {
+                    $after_tag_id[] = $value;
+                }
+            }
+
+            $where[] = [function ($query) use ($tag_id, $before_tag_id, $after_tag_id) {
+                $query = $query->where('tag_id', '=', '[' . implode(',', $tag_id) . ']');
+                foreach ($after_tag_id as $value) {
+                    $query->orWhere(function ($query) use ($before_tag_id, $value) {
+                        $query->where('tag_id', 'like', '[' . implode(',', $before_tag_id) . ',[2,%')->where('tag_id', 'like', '%' . $value . '%');
+                    });
+                }
+            }];
         }
 
         $total = $mMatch->where($where)->count();
