@@ -305,4 +305,51 @@ class MatchController extends Controller
             return $this->jsonAdminResult([],10001,'操作失败');
         }
     }
+
+    /**
+     * @name 统计
+     * @Get("/lv/match/match/stat")
+     * @Version("v1")
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     **/
+    public function stat(Request $request, Match $mMatch, Tag $mTag)
+    {
+        $params = $request->all();
+
+        $tag_sub_list = DB::select('SELECT pid, id, name FROM `tags` WHERE pid = 1 order by convert(name using gbk) asc');
+        $tag_sub_list = $this->dbResult($tag_sub_list);
+
+        $match_list = $mMatch->get(['tag_id', 'created_at']);
+        $match_list = $this->dbResult($match_list);
+
+        $match_stat = [];
+        $total_num = count($match_list);
+        $today_num = 0;
+        $today_date = date('Y-m-d 00:00:00');
+        foreach ($match_list as $value) {
+            if ($value['created_at'] >= $today_date) { // 今日
+                $today_num++;
+            }
+            $tag_id = json_decode($value['tag_id'], true);
+            foreach ($tag_id as $tags) {
+                if (is_array($tags)) {
+                    if (!isset($match_stat[$tags[1]])) {
+                        $match_stat[$tags[1]] = 0;
+                    }
+                    $match_stat[$tags[1]]++;
+                }
+            }
+        }
+        $stat_list = [];
+        $stat_list[] = '比赛总数：' . $total_num;
+        $stat_list[] = '今日入场：' . $today_num;
+        foreach ($tag_sub_list as $value) {
+            $stat_list[] = $value['name'] . '：' . ($match_stat[$value['id']] ?? 0);
+        }
+
+        return $this->jsonAdminResult([
+            'stat_list' => $stat_list
+        ]);
+    }
 }

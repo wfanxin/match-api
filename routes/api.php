@@ -30,6 +30,7 @@ $dingoApi->version("v1", [
     $dingoApi->post("match/match/add", \App\Http\Controllers\Admin\Match\MatchController::class."@add")->name("match.match.add");
     $dingoApi->post("match/match/edit", \App\Http\Controllers\Admin\Match\MatchController::class."@edit")->name("match.match.edit");
     $dingoApi->post("match/match/del", \App\Http\Controllers\Admin\Match\MatchController::class."@del")->name("match.match.del");
+    $dingoApi->get("match/match/stat", \App\Http\Controllers\Admin\Match\MatchController::class."@stat")->name("match.match.stat");
 
     // 用户
     $dingoApi->post("users/checkName", \App\Http\Controllers\Admin\System\UserController::class."@checkName")->name("users.checkName");
