@@ -30,7 +30,11 @@ $dingoApi->version("v1", [
     $dingoApi->post("match/match/add", \App\Http\Controllers\Admin\Match\MatchController::class."@add")->name("match.match.add");
     $dingoApi->post("match/match/edit", \App\Http\Controllers\Admin\Match\MatchController::class."@edit")->name("match.match.edit");
     $dingoApi->post("match/match/del", \App\Http\Controllers\Admin\Match\MatchController::class."@del")->name("match.match.del");
+    $dingoApi->post("match/match/saveTogether", \App\Http\Controllers\Admin\Match\MatchController::class."@saveTogether")->name("match.match.saveTogether");
     $dingoApi->get("match/match/stat", \App\Http\Controllers\Admin\Match\MatchController::class."@stat")->name("match.match.stat");
+    $dingoApi->get("match/match/getTogether", \App\Http\Controllers\Admin\Match\MatchController::class."@getTogether")->name("match.match.getTogether");
+    $dingoApi->post("match/match/editTogether", \App\Http\Controllers\Admin\Match\MatchController::class."@editTogether")->name("match.match.editTogether");
+    $dingoApi->post("match/match/delTogether", \App\Http\Controllers\Admin\Match\MatchController::class."@delTogether")->name("match.match.delTogether");
 
     // 用户
     $dingoApi->post("users/checkName", \App\Http\Controllers\Admin\System\UserController::class."@checkName")->name("users.checkName");
