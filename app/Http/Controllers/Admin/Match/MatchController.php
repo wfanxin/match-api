@@ -76,15 +76,23 @@ class MatchController extends Controller
         $orderField = 'id';
         $sort = 'desc';
         $list = $mMatch->where($where)
+            ->orderBy('is_top', 'desc')
             ->orderBy($orderField, $sort)
             ->limit(config('global.page_size'))
             ->get();
         $list = $this->dbResult($list);
 
         if (!empty($list)) {
+            $platform_arr = array_column(config('global.platform_list'), 'label', 'value');
             foreach ($list as $k => $v){
                 $list[$k]['tag_id'] = json_decode($v['tag_id'], true) ?? [];
-                $list[$k]['match_data'] = json_decode($v['match_data'], true) ?? [];
+                $match_data = json_decode($v['match_data'], true) ?? [];
+                foreach ($match_data as $match_key => $match_value) {
+                    if (empty($match_value['name'])) {
+                        $match_data[$match_key]['name'] = $platform_arr[$match_value['value']] ?? '';
+                    }
+                }
+                $list[$k]['match_data'] = $match_data;
             }
         }
 
@@ -111,6 +119,7 @@ class MatchController extends Controller
 
         $ptag_id = $params['ptag_id'] ?? 0;
         $tag_id = $params['tag_id'] ?? [];
+        $is_top = $params['is_top'] ?? 0;
         $match_play = trim($params['match_play'] ?? '');
         $match_score = trim($params['match_score'] ?? '');
         $match_result = trim($params['match_result'] ?? '');
@@ -164,6 +173,7 @@ class MatchController extends Controller
         $res = $mMatch->insert([
             'ptag_id' => $ptag_id,
             'tag_id' => json_encode($tag_id),
+            'is_top' => $is_top,
             'match_play' => $match_play,
             'match_score' => $match_score,
             'match_result' => $match_result,
@@ -195,6 +205,7 @@ class MatchController extends Controller
         $id = $params['id'] ?? 0;
         $ptag_id = $params['ptag_id'] ?? 0;
         $tag_id = $params['tag_id'] ?? [];
+        $is_top = $params['is_top'] ?? 0;
         $match_play = trim($params['match_play'] ?? '');
         $match_score = trim($params['match_score'] ?? '');
         $match_result = trim($params['match_result'] ?? '');
@@ -252,6 +263,7 @@ class MatchController extends Controller
         $res = $mMatch->where('id', $id)->update([
             'ptag_id' => $ptag_id,
             'tag_id' => json_encode($tag_id),
+            'is_top' => $is_top,
             'match_play' => $match_play,
             'match_score' => $match_score,
             'match_result' => $match_result,
