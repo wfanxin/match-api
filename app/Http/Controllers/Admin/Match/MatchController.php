@@ -57,12 +57,23 @@ class MatchController extends Controller
                 }
             }
 
+//            $where[] = [function ($query) use ($tag_id, $before_tag_id, $after_tag_id) {
+//                $query = $query->where('tag_id', '=', '[' . implode(',', $tag_id) . ']');
+//                foreach ($after_tag_id as $value) {
+//                    $query->orWhere(function ($query) use ($before_tag_id, $value) {
+//                        $query->where('tag_id', 'like', '[' . implode(',', $before_tag_id) . ',[2,%')->where('tag_id', 'like', '%' . $value . '%');
+//                    });
+//                }
+//            }];
+
             $where[] = [function ($query) use ($tag_id, $before_tag_id, $after_tag_id) {
                 $query = $query->where('tag_id', '=', '[' . implode(',', $tag_id) . ']');
-                foreach ($after_tag_id as $value) {
-                    $query->orWhere(function ($query) use ($before_tag_id, $value) {
-                        $query->where('tag_id', 'like', '[' . implode(',', $before_tag_id) . ',[2,%')->where('tag_id', 'like', '%' . $value . '%');
-                    });
+                foreach ($before_tag_id as $before_value) {
+                    foreach ($after_tag_id as $after_value) {
+                        $query->orWhere(function ($query) use ($before_value, $after_value) {
+                            $query->where('tag_id', 'like', '%' . $before_value . '%')->where('tag_id', 'like', '%' . $after_value . '%');
+                        });
+                    }
                 }
             }];
         }
